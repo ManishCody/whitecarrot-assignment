@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -30,9 +31,25 @@ export default function LoginPage() {
     mode: "onChange",
   });
 
-  const onSubmit = (values: LoginValues) => {
-    login({ email: values.email, token: "mock-token" });
-    router.push("/");
+  const onSubmit = async (values: LoginValues) => {
+    try {
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || "Login failed");
+      }
+      login({ email: data.user.email, token: data.token, id: data.user.id });
+      toast.success("Logged in successfully");
+      router.push("/");
+    } catch (err: any) {
+      const message = err?.message || "Login failed";
+      form.setError("password", { type: "server", message });
+      toast.error(message);
+    }
   };
 
   return (

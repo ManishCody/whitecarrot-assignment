@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -37,9 +38,25 @@ export default function RegisterPage() {
     mode: "onChange",
   });
 
-  const onSubmit = (values: RegisterValues) => {
-    login({ email: values.email, name: values.name, token: "mock-token" });
-    router.push("/");
+  const onSubmit = async (values: RegisterValues) => {
+    try {
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: values.email, password: values.password }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.error || "Registration failed");
+      }
+      login({ email: data.user.email, name: values.name, token: data.token, id: data.user.id });
+      toast.success("Account created successfully");
+      router.push("/");
+    } catch (err: any) {
+      const message = err?.message || "Registration failed";
+      form.setError("confirmPassword", { type: "server", message });
+      toast.error(message);
+    }
   };
 
   return (
