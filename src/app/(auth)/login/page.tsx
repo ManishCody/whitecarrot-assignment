@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ type LoginValues = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((s: AuthState) => s.login);
 
   const form = useForm<LoginValues>({
@@ -44,7 +45,9 @@ export default function LoginPage() {
       }
       login({ email: data.user.email, token: data.token, id: data.user.id });
       toast.success("Logged in successfully");
-      router.push("/");
+      const nextParam = searchParams.get("next");
+      const nextPath = nextParam ? decodeURIComponent(nextParam) : "/";
+      router.push(nextPath);
     } catch (err: any) {
       const message = err?.message || "Login failed";
       form.setError("password", { type: "server", message });
