@@ -1,0 +1,122 @@
+"use client";
+
+import React from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { useAuthStore, type AuthState } from "@/store/auth";
+
+const RegisterSchema = z
+  .object({
+    name: z.string().min(2, "Enter your name"),
+    email: z.string().email("Enter a valid email"),
+    password: z.string().min(6, "Minimum 6 characters"),
+    confirmPassword: z.string().min(6, "Minimum 6 characters"),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords do not match",
+    path: ["confirmPassword"],
+  });
+
+type RegisterValues = z.infer<typeof RegisterSchema>;
+
+export default function RegisterPage() {
+  const router = useRouter();
+  const login = useAuthStore((s: AuthState) => s.login);
+
+  const form = useForm<RegisterValues>({
+    resolver: zodResolver(RegisterSchema),
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+    mode: "onChange",
+  });
+
+  const onSubmit = (values: RegisterValues) => {
+    login({ email: values.email, name: values.name, token: "mock-token" });
+    router.push("/");
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Create your account</CardTitle>
+        <CardDescription>Sign up to get started</CardDescription>
+      </CardHeader>
+      <CardContent>
+        <Form {...(form as any)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+            <FormField
+              control={form.control}
+              name="name"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Name</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Your name" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input type="email" placeholder="you@example.com" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="password"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="confirmPassword"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Confirm Password</FormLabel>
+                  <FormControl>
+                    <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button type="submit" className="w-full">Create account</Button>
+          </form>
+        </Form>
+      </CardContent>
+      <CardFooter className="justify-center text-sm text-muted-foreground">
+        <span>Already have an account? </span>
+        <Link href="/login" className="ml-1 underline">
+          Login
+        </Link>
+      </CardFooter>
+    </Card>
+  );
+}
