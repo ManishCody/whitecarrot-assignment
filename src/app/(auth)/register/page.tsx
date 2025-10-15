@@ -49,7 +49,7 @@ export default function RegisterPage() {
         password: values.password,
         recruiterCode: values.recruiterCode,
       });
-      login({ email: data.user.email, name: values.name, token: data.token, id: data.user.id });
+      login({ user: data.user });
       toast.success("Account created successfully");
       router.push("/");
     } catch (err: any) {
