@@ -1,5 +1,5 @@
 "use client";
-import React, { Suspense } from "react";
+import React, { Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useForm, FieldValues, UseFormReturn } from "react-hook-form";
@@ -25,6 +25,14 @@ function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((s: AuthState) => s.login);
+  const user = useAuthStore((s: AuthState) => s.user);
+
+  useEffect(() => {
+    if (user) {
+      toast.info("You are already logged in");
+      router.push("/dashboard");
+    }
+  }, [user, router]);
 
   const form = useForm<LoginValues>({
     resolver: zodResolver(LoginSchema),

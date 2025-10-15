@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useForm, FieldValues, UseFormReturn } from "react-hook-form";
@@ -34,6 +34,14 @@ interface RegisterValues extends FieldValues, z.infer<typeof RegisterSchema> {}
 export default function RegisterPage() {
   const router = useRouter();
   const login = useAuthStore((s: AuthState) => s.login);
+  const user = useAuthStore((s: AuthState) => s.user);
+
+  useEffect(() => {
+    if (user) {
+      toast.info("You are already logged in");
+      router.push("/dashboard");
+    }
+  }, [user, router]);
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(RegisterSchema),
