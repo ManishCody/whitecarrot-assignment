@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { searchCompaniesByJobTitle } from "@/lib/controllers/company-controller";
 
-export const runtime = "nodejs";
+
 
 export async function GET(req: Request) {
   try {

@@ -4,16 +4,14 @@ import { createCompany, getCompaniesByCreator } from "@/lib/controllers/company-
 import { Company } from "@/models/Company";
 import { verifyJwt } from "@/lib/auth";
 
-export const runtime = "nodejs";
+
 
 export async function GET(req: NextRequest) {
   try {
-    // Try to get user info from middleware headers first
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
     let role = (await headerList).get('x-user-role');
 
-    // If no user info from middleware, try to get token from cookies directly
     if (!userId || !role) {
       const cookieStore = cookies();
       const token = (await cookieStore).get('token')?.value;
@@ -24,7 +22,6 @@ export async function GET(req: NextRequest) {
           userId = decoded.sub;
           role = decoded.role;
         } catch (error) {
-          // Continue without authentication for public companies
         }
       }
     }
@@ -44,12 +41,10 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    // Try to get user info from middleware headers first
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
     let role = (await headerList).get('x-user-role');
 
-    // If no user info from middleware, try to get token from cookies directly
     if (!userId || !role) {
       const cookieStore = cookies();
       const token = (await cookieStore).get('token')?.value;

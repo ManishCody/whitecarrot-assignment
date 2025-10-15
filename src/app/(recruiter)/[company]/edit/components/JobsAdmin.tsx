@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,6 +17,7 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [jobs, setJobs] = useState<any[]>([]);
+  const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
   // form fields
   const [title, setTitle] = useState("");
@@ -68,13 +70,11 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
 
   useEffect(() => {
     loadJobs();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [slug]);
 
   const onCreate = async () => {
     if (!canSubmit) return;
     
-    // Additional validation
     if (!workPolicy.trim()) {
       toast.error("Work Policy is required");
       return;
@@ -106,12 +106,15 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
   };
 
   const onDelete = async (id: string) => {
+    setDeletingJobId(id);
     try {
       await axiosInstance.delete(`/api/jobs/${id}`);
       toast.success("Job deleted");
       await loadJobs();
     } catch (e: any) {
       toast.error(e?.message || "Failed to delete job");
+    } finally {
+      setDeletingJobId(null);
     }
   };
 
@@ -171,6 +174,7 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
 
           <div className="flex items-center gap-2 pt-2">
             <Button onClick={onCreate} disabled={!canSubmit || submitting}>
+              {submitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {submitting ? "Creating..." : "Create Job"}
             </Button>
           </div>
@@ -199,8 +203,14 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
-                      <Button variant="destructive" size="sm" onClick={() => onDelete(job._id)}>
-                        Delete
+                      <Button 
+                        variant="destructive" 
+                        size="sm" 
+                        onClick={() => onDelete(job._id)}
+                        disabled={deletingJobId === job._id}
+                      >
+                        {deletingJobId === job._id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                        {deletingJobId === job._id ? "Deleting..." : "Delete"}
                       </Button>
                     </div>
                   </div>

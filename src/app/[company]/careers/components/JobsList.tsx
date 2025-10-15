@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card } from "@/components/ui/card";
@@ -45,7 +46,6 @@ export function JobsList({ slug }: { slug: string }) {
         const data = res.data;
         setJobs(Array.isArray(data.jobs) ? data.jobs : []);
       } catch (e: any) {
-        // Only show error if it's not an authentication issue on public page
         if (!e?.message?.includes('Unauthorized')) {
           toast.error(e?.message || "Failed to fetch jobs");
         }
@@ -66,7 +66,6 @@ export function JobsList({ slug }: { slug: string }) {
         const appliedJobIds = res.data.map((app: any) => app.job?._id).filter(Boolean);
         setAppliedJobs(new Set(appliedJobIds));
       } catch (e: any) {
-        // Silently handle auth errors for public pages
         if (!e?.message?.includes('Unauthorized')) {
           console.error("Failed to fetch applied jobs", e);
         }
@@ -234,6 +233,7 @@ export function JobsList({ slug }: { slug: string }) {
                               : `Apply for ${job.title} position`
                         }
                       >
+                        {applying === job._id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                         {appliedJobs.has(job._id) ? '✓ Applied' : (applying === job._id ? 'Applying...' : 'Apply Now')}
                       </Button>
                     )

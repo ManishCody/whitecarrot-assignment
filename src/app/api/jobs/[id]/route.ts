@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { updateJob, deleteJob } from "@/lib/controllers/job-controller";
 import { requireAuthWithRole } from "@/lib/auth-helper";
 
-export const runtime = "nodejs";
+
 
 type Params = { params: Promise<{ id: string }> };
 

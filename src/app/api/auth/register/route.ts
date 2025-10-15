@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { registerUser } from "@/lib/controllers/auth-controller";
 
-export const runtime = "nodejs";
+
 
 export async function POST(req: Request) {
   try {

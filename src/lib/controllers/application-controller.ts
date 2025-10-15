@@ -3,6 +3,7 @@ import { Application } from "@/models/Application";
 import { Job } from "@/models/Job";
 import { Company } from "@/models/Company";
 import { User } from "@/models/User";
+import { Types } from "mongoose";
 
 export async function getMyApplications(userId: string) {
   await connectDB();
@@ -19,7 +20,7 @@ export async function getApplicationsByCompany(companySlug: string) {
     throw new Error('Company not found');
   }
 
-  const jobs = await Job.find({ companyId: company._id });
+  const jobs: { _id: string }[] = await Job.find({ companyId: company._id }).lean();
   const jobIds = jobs.map(job => job._id);
 
   const applications = await Application.find({ job: { $in: jobIds } })
@@ -33,5 +34,5 @@ export async function getApplicationsByCompany(companySlug: string) {
 export async function getMyApplicationJobIds(userId: string) {
   await connectDB();
   const applications = await Application.find({ candidate: userId }).select("job").lean();
-  return applications.map(app => String(app.job));
+  return applications.map((app: { job: Types.ObjectId | string }) => String(app.job));
 }

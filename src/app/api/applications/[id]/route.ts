@@ -18,8 +18,6 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
 
     await connectDB();
 
-    // TODO: Add a check to ensure the recruiter owns the company associated with this application
-
     const { id } = await params;
     const updatedApplication = await Application.findByIdAndUpdate(
       id,

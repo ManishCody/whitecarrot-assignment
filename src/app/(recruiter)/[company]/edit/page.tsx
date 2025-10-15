@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { toast } from "sonner";
+import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -26,6 +27,8 @@ export default function CompanyEditPage() {
   const [cultureVideoUrl, setCultureVideoUrl] = useState("");
   const [sections, setSections] = useState<ContentSection[]>([]);
   const [isPublished, setIsPublished] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const { user, loading: isAuthLoading } = useAuthStore((s) => ({ user: s.user, loading: s.loading }));
 
   useEffect(() => {
@@ -55,7 +58,7 @@ export default function CompanyEditPage() {
         if (e.response?.status === 401 || e.response?.status === 403) {
           toast.error("You are not authorized to edit this page");
           router.push(`/${slug}/careers`);
-        } else if (e.response?.status !== 404) { // 404 is okay, it means we're creating a new company
+        } else if (e.response?.status !== 404) { 
           toast.error(e?.message || "Failed to load company");
         }
       } finally {
@@ -68,6 +71,7 @@ export default function CompanyEditPage() {
   }, [slug, user, isAuthLoading, router]);
 
   const onSave = async () => {
+    setSaving(true);
     try {
       const payload = {
         name: companyName || slug,
@@ -92,6 +96,8 @@ export default function CompanyEditPage() {
       toast.success("Settings saved");
     } catch (e: any) {
       toast.error(e?.message || "Save failed");
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -100,6 +106,7 @@ export default function CompanyEditPage() {
   };
 
   const onPublish = async () => {
+    setPublishing(true);
     try {
       const method = isPublished ? "delete" : "post";
       const res = await axiosInstance[method](`/api/company/${encodeURIComponent(slug)}/publish`);
@@ -108,6 +115,8 @@ export default function CompanyEditPage() {
       toast.success(isPublished ? "Page unpublished" : "Page published! Share your careers link.");
     } catch (e: any) {
       toast.error(e?.message || "Publish failed");
+    } finally {
+      setPublishing(false);
     }
   };
 
@@ -119,15 +128,17 @@ export default function CompanyEditPage() {
           <Button variant="secondary" onClick={onPreview}>
             Preview Page
           </Button>
-          <Button onClick={onSave} disabled={loading}>
-            {loading ? "Loading..." : "Save Changes"}
+          <Button onClick={onSave} disabled={loading || saving}>
+            {saving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {saving ? "Saving..." : "Save Changes"}
           </Button>
           <Button 
             onClick={onPublish} 
-            disabled={loading}
+            disabled={loading || publishing}
             variant={isPublished ? "destructive" : "default"}
           >
-            {isPublished ? "Unpublish" : "Publish"}
+            {publishing && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            {publishing ? (isPublished ? "Unpublishing..." : "Publishing...") : (isPublished ? "Unpublish" : "Publish")}
           </Button>
         </div>
       </div>

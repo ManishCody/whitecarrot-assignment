@@ -3,16 +3,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { headers, cookies } from 'next/headers';
 import { verifyJwt } from "@/lib/auth";
 
-export const runtime = "nodejs";
+
 
 export async function GET(req: NextRequest) {
   try {
-    // Try to get user info from middleware headers first
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
     let role = (await headerList).get('x-user-role');
 
-    // If no user info from middleware, try to get token from cookies directly
     if (!userId || !role) {
       const cookieStore = cookies();
       const token = (await cookieStore).get('token')?.value;

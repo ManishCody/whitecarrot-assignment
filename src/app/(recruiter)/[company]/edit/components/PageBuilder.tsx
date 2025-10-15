@@ -21,7 +21,6 @@ import { ContentSection } from "@/models/Company";
 import { SectionEditor } from "./SectionEditor";
 import { SectionPreview } from "./SectionPreview";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { GripVertical, Plus } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 

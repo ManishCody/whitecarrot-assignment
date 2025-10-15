@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { listJobs, createJob } from "@/lib/controllers/job-controller";
 import { requireAuthWithRole } from "@/lib/auth-helper";
 
-export const runtime = "nodejs";
+
 
 export async function GET(req: Request) {
   try {
@@ -26,7 +26,6 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // Require authentication for job creation
     let auth;
     try {
       auth = await requireAuthWithRole();

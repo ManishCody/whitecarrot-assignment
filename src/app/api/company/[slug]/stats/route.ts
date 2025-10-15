@@ -4,8 +4,6 @@ import { Job, IJob } from '@/models/Job';
 import { connectDB } from '@/lib/db';
 import { requireAuthWithRole } from '@/lib/auth-helper';
 
-export const runtime = 'nodejs';
-
 export async function GET(req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {
     await requireAuthWithRole('RECRUITER');

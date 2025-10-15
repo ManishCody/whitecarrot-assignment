@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createCompany } from "@/lib/controllers/company-controller";
 
-export const runtime = "nodejs";
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
     if (!userId) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
-    const created = await createCompany(body, userId);
+    const created = await createCompany(body);
     return NextResponse.json(created, { status: 201 });
   } catch (err: any) {
     const status = err?.status || 500;

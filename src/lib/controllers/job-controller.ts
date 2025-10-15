@@ -81,7 +81,6 @@ export async function updateJob(
 
   const patch: typeof input = { ...input };
   if (patch.postedDaysAgo !== undefined && patch.postedDaysAgo !== null) {
-    // coerce to number
     (patch as any).postedDaysAgo = Number(patch.postedDaysAgo) || 0;
   }
 

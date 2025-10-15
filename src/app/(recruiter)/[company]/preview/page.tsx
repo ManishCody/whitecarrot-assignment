@@ -22,7 +22,7 @@ export default function CompanyPreviewPage() {
   const [sections, setSections] = useState<ContentSection[]>([]);
 
   useEffect(() => {
-    if (isAuthLoading) return; // Wait for auth state to load
+    if (isAuthLoading) return; 
 
     if (user && user.role === 'CANDIDATE') {
       toast.error("You are not authorized to access this page.");

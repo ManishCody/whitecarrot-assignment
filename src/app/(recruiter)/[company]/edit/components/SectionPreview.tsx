@@ -39,7 +39,6 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
             <div className="absolute inset-0 bg-black/40" />
             <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white">
               {company?.logoUrl ? (
-                // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={company.logoUrl}
                   alt="Company logo"

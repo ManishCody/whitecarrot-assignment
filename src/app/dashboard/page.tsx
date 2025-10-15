@@ -4,6 +4,7 @@ import { useAuthStore } from "@/store/auth";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { axiosInstance } from "@/lib/axios";
+import { Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -28,10 +29,11 @@ export default function DashboardPage() {
   const [selectedCompany, setSelectedCompany] = useState<any>(null);
   const [companyApplications, setCompanyApplications] = useState<any[]>([]);
   const [loadingApplications, setLoadingApplications] = useState(false);
+  const [creatingCompany, setCreatingCompany] = useState(false);
 
   useEffect(() => {
     if (isAuthLoading) {
-      return; // Wait for the auth state to load
+      return; 
     }
 
     if (!user) {
@@ -83,6 +85,7 @@ export default function DashboardPage() {
       return;
     }
 
+    setCreatingCompany(true);
     try {
       const slug = newCompanyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
       const res = await axiosInstance.post('/api/companies', {
@@ -97,6 +100,8 @@ export default function DashboardPage() {
       router.push(`/${slug}/edit`);
     } catch (err: any) {
       toast.error(err.message || "Failed to create company");
+    } finally {
+      setCreatingCompany(false);
     }
   };
 
@@ -166,11 +171,12 @@ export default function DashboardPage() {
                         />
                       </div>
                       <div className="flex justify-end space-x-2">
-                        <Button variant="outline" onClick={() => setCreateCompanyOpen(false)}>
+                        <Button variant="outline" onClick={() => setCreateCompanyOpen(false)} disabled={creatingCompany}>
                           Cancel
                         </Button>
-                        <Button onClick={handleCreateCompany}>
-                          Create Company
+                        <Button onClick={handleCreateCompany} disabled={creatingCompany}>
+                          {creatingCompany && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                          {creatingCompany ? "Creating..." : "Create Company"}
                         </Button>
                       </div>
                     </div>

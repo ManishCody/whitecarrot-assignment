@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { publishCompanyBySlug, unpublishCompanyBySlug } from "@/lib/controllers/company-controller";
 
-export const runtime = "nodejs";
+
 
 export async function POST(_req: Request, { params }: { params: Promise<{ slug: string }> }) {
   try {

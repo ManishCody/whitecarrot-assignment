@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { loginUser } from "@/lib/controllers/auth-controller";
 
-export const runtime = "nodejs";
+
 
 export async function POST(req: Request) {
   try {
@@ -14,7 +14,7 @@ export async function POST(req: Request) {
     const response = NextResponse.json({ user: data.user }, { status: 200 });
     response.cookies.set('token', data.token, { 
       httpOnly: true, 
-      secure: false, // Disable secure for development
+      secure: false, 
       sameSite: 'lax',
       path: '/', 
       maxAge: 60 * 60 * 24 * 7 

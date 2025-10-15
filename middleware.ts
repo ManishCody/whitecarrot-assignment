@@ -2,8 +2,6 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { verifyJwt } from '@/lib/auth';
 
-export const runtime = 'nodejs';
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('token')?.value;
@@ -59,8 +57,6 @@ export async function middleware(req: NextRequest) {
   return NextResponse.next();
 }
 
-// This matcher runs the middleware on all routes except for static assets.
-// The logic within the middleware then handles which routes are public and which are protected.
 export const config = {
   matcher: [
     '/((?!_next/static|_next/image|favicon.ico).*)',

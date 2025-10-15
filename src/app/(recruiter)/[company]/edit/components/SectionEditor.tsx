@@ -18,7 +18,6 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
   const [showBgColorPicker, setShowBgColorPicker] = useState(false);
   const [showTextColorPicker, setShowTextColorPicker] = useState(false);
 
-  // Local buffers for JSON text so user can type invalid JSON and fix it before applying
   const [valuesJson, setValuesJson] = useState<string>(
     JSON.stringify(section.data?.values || [], null, 2)
   );
@@ -30,7 +29,6 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
   );
   const [jsonError, setJsonError] = useState<string>("");
 
-  // When the section changes, reset the buffers
   useEffect(() => {
     setValuesJson(JSON.stringify(section.data?.values || [], null, 2));
     setLocationsJson(JSON.stringify(section.data?.locations || [], null, 2));

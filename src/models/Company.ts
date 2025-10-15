@@ -1,6 +1,5 @@
 import { Schema, models, model } from "mongoose";
 
-// Rich content section types for the page builder
 export type ContentSection = {
   id: string;
   type: 'hero' | 'text' | 'image' | 'video' | 'values' | 'locations' | 'perks' | 'testimonial' | 'cta';
@@ -12,7 +11,7 @@ export type ContentSection = {
   textColor?: string;
   alignment?: 'left' | 'center' | 'right';
   size?: 'small' | 'medium' | 'large';
-  data?: Record<string, any>; // For complex section data like values, locations
+  data?: Record<string, any>; 
 };
 
 const CompanySchema = new Schema(
@@ -23,7 +22,7 @@ const CompanySchema = new Schema(
     bannerUrl: { type: String },
     cultureVideo: { type: String },
     primaryColor: { type: String, default: "#0A66C2" },
-    sections: { type: Schema.Types.Mixed, default: [] }, // Array of ContentSection
+    sections: { type: Schema.Types.Mixed, default: [] }, 
     isPublished: { type: Boolean, default: false },
     publishedAt: { type: Date },
     createdBy: { type: Schema.Types.ObjectId, ref: "User", required: true },

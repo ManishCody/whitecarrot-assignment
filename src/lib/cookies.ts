@@ -1,8 +1,7 @@
 "use client";
 
-// Minimal cookie helpers for client-side usage only (no SSR usage here)
 export type CookieSetOptions = {
-  days?: number; // expiry in days
+  days?: number; 
   path?: string;
 };
 

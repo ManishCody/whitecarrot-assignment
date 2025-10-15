@@ -6,18 +6,12 @@ export type AuthResult = {
   role: string;
 } | null;
 
-/**
- * Helper function to get authenticated user info with fallback pattern
- * First tries middleware headers, then falls back to cookie authentication
- */
 export async function getAuthenticatedUser(): Promise<AuthResult> {
   try {
-    // Try to get user info from middleware headers first
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
     let role = (await headerList).get('x-user-role');
 
-    // If no user info from middleware, try to get token from cookies directly
     if (!userId || !role) {
       const cookieStore = cookies();
       const token = (await cookieStore).get('token')?.value;
@@ -45,9 +39,6 @@ export async function getAuthenticatedUser(): Promise<AuthResult> {
   }
 }
 
-/**
- * Helper function to require authentication with specific role
- */
 export async function requireAuthWithRole(requiredRole?: string): Promise<AuthResult> {
   const auth = await getAuthenticatedUser();
   
