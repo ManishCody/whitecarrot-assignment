@@ -1,3 +1,8 @@
+# Depoloy link 
+https://whitecarrot-assignment-omega.vercel.app/
+https://wondrous-lebkuchen-56e1e6.netlify.app/
+
+
 # WhiteCarrot - Careers Page Builder
 
 A platform where companies can build their own careers pages and manage job applications. Recruiters get a page builder to customize their company page, and candidates can browse jobs and apply.
