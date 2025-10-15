@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,9 +11,20 @@ import { useCompanies } from '@/hooks/useCompanies';
 export function CandidateSearch() {
   const [searchQuery, setSearchQuery] = useState('');
   const [page, setPage] = useState(1);
-  const { companies, isLoading, isError } = useCompanies(page, searchQuery);
+
+  const query = useMemo(() => searchQuery, [searchQuery]);
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
+
+  useEffect(() => {
+    const id = setTimeout(() => setDebouncedQuery(query), 200);
+    return () => clearTimeout(id);
+  }, [query]);
+
+  const { companies, isLoading, isError } = useCompanies(page, debouncedQuery);
 
   const totalPages = companies?.total ? Math.ceil(companies.total / companies.limit) : 1;
+
+  const showPagination = !searchQuery && totalPages > 1;
 
   return (
     <div role="main" aria-labelledby="discover-companies-heading">
@@ -31,7 +42,7 @@ export function CandidateSearch() {
           autoComplete="off"
         />
         <div id="search-help" className="sr-only">
-          Type to search for companies by name or available job titles. Results will update automatically as you type.
+          Type to search for companies by name or available job titles. Search results will appear after a brief delay as you type.
         </div>
       </div>
 
@@ -99,7 +110,7 @@ export function CandidateSearch() {
         )}
       </div>
 
-      {searchQuery.length < 2 && totalPages > 1 && (
+      {showPagination && (
         <nav className="mt-4 flex justify-between items-center" aria-label="Company list pagination">
           <Button 
             onClick={() => setPage(p => Math.max(1, p - 1))} 
