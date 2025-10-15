@@ -42,7 +42,7 @@ npm run dev
 **Create a Recruiter Account:**
 - Go to `/register`
 - Fill in your details
-- Use recruiter code: `RECRUITER2024` (this makes you a recruiter instead of candidate)
+- Use recruiter code: `SUPER_SECRET_CODE` (this makes you a recruiter instead of candidate)
 - Login and you'll see dashboard
 
 **Create a Company:**
