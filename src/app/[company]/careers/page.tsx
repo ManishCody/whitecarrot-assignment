@@ -5,8 +5,8 @@ import { SectionPreview } from "../../(recruiter)/[company]/edit/components/Sect
 import { ContentSection } from "@/models/Company";
 
 type PageProps = {
-  params: { company: string };
-  searchParams?: Record<string, string | string[] | undefined>;
+  params: Promise<{ company: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
