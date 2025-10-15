@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/header";
 import { ToastProvider } from "@/components/toast-provider";
+import { SWRProvider } from "@/providers/swr-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -15,8 +16,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "White Carrot",
-  description: "A Next.js starter template with TypeScript and Tailwind CSS",
+  title: "WhiteCarrot - Careers Page Builder",
+  description: "Build beautiful, branded careers pages for your company. Help candidates discover opportunities and apply seamlessly.",
+  keywords: ["careers", "jobs", "hiring", "recruitment", "ATS", "careers page builder"],
+  authors: [{ name: "WhiteCarrot" }],
+  viewport: "width=device-width, initial-scale=1",
+  robots: "index, follow",
 };
 
 export default function RootLayout({

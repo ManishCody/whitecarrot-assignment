@@ -3,6 +3,7 @@ import { Schema, models, model } from "mongoose";
 const JobSchema = new Schema(
   {
     title: { type: String, required: true },
+    workPolicy: { type: String, required: true },
     location: { type: String, required: true },
     department: { type: String, required: true },
     employmentType: { type: String, required: true },
@@ -19,6 +20,7 @@ const JobSchema = new Schema(
 export type IJob = {
   _id: string;
   title: string;
+  workPolicy: string;
   location: string;
   department: string;
   employmentType: string;
