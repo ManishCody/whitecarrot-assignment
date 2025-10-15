@@ -6,11 +6,6 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
   const token = req.cookies.get('token')?.value;
   
-  console.log('[Middleware] Path:', pathname);
-  console.log('[Middleware] Has token:', !!token);
-  console.log('[Middleware] All cookies:', req.cookies.getAll().map(c => c.name));
-  console.log('[Middleware] Environment:', process.env.NODE_ENV);
-
   const protectedPaths = [
     '/dashboard',
     '/api/auth/me',
@@ -24,9 +19,7 @@ export async function middleware(req: NextRequest) {
   const isProtectedRoute = protectedPaths.some(path => pathname.startsWith(path));
 
   if (isProtectedRoute) {
-    console.log('[Middleware] Protected route detected');
     if (!token) {
-      console.log('[Middleware] No token found, redirecting to login');
       if (pathname.startsWith('/api')) {
         return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
           status: 401,
@@ -40,7 +33,6 @@ export async function middleware(req: NextRequest) {
 
     try {
       const decoded = verifyJwt(token);
-      console.log('[Middleware] Token verified successfully for user:', decoded.sub);
       const requestHeaders = new Headers(req.headers);
       requestHeaders.set('x-user-id', decoded.sub);
       requestHeaders.set('x-user-role', decoded.role);
