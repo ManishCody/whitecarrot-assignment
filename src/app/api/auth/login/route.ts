@@ -12,12 +12,16 @@ export async function POST(req: Request) {
     }
     const data = await loginUser({ email, password });
     const response = NextResponse.json({ user: data.user }, { status: 200 });
+    
+    // Set secure flag based on environment
+    const isProduction = process.env.NODE_ENV === 'production';
+    
     response.cookies.set('token', data.token, { 
       httpOnly: true, 
-      secure: false, 
+      secure: isProduction, 
       sameSite: 'lax',
       path: '/', 
-      maxAge: 60 * 60 * 24 * 7 
+      maxAge: 60 * 60 * 24 * 7 // 7 days
     });
     return response;
   } catch (err: unknown) {
