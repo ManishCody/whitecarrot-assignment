@@ -4,7 +4,7 @@ import { comparePassword, hashPassword, signJwt } from "@/lib/auth";
 
 export async function getUserById(id: string) {
   await connectDB();
-  const user = await User.findById(id).select("-passwordHash");
+  const user = await (User as any).findById(id).select("-passwordHash");
   if (!user) {
     throw Object.assign(new Error("User not found"), { status: 404 });
   }
@@ -13,7 +13,7 @@ export async function getUserById(id: string) {
 
 export async function registerUser(input: { name: string; email: string; password: string; recruiterCode?: string }) {
   await connectDB();
-  const existing = await User.findOne({ email: input.email });
+  const existing = await (User as any).findOne({ email: input.email });
   if (existing) {
     throw Object.assign(new Error("Email already in use"), { status: 409 });
   }
@@ -21,7 +21,7 @@ export async function registerUser(input: { name: string; email: string; passwor
 
   const role = input.recruiterCode === "SUPER_SECRET_CODE" ? "RECRUITER" : "CANDIDATE";
 
-  const user = await User.create({ 
+  const user = await (User as any).create({ 
     name: input.name,
     email: input.email, 
     passwordHash, 
@@ -33,7 +33,7 @@ export async function registerUser(input: { name: string; email: string; passwor
 
 export async function loginUser(input: { email: string; password: string }) {
   await connectDB();
-  const user = await User.findOne({ email: input.email });
+  const user = await (User as any).findOne({ email: input.email });
   if (!user) {
     throw Object.assign(new Error("Invalid credentials"), { status: 401 });
   }

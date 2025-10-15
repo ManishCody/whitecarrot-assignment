@@ -18,18 +18,18 @@ export async function GET(req: Request) {
 
     const { company, jobs } = await listJobs({ companySlug, location, jobType, title, department });
     return NextResponse.json({ company, jobs }, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }
 
 export async function POST(req: Request) {
   try {
-    let auth;
     try {
-      auth = await requireAuthWithRole();
-    } catch (error) {
+      await requireAuthWithRole();
+    } catch (_error) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
     
@@ -66,8 +66,9 @@ export async function POST(req: Request) {
     });
 
     return NextResponse.json({ job }, { status: 201 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

@@ -54,12 +54,13 @@ export default function CompanyEditPage() {
         setSections(Array.isArray(c.sections) ? c.sections : []);
         setIsPublished(c.isPublished ?? false);
 
-              } catch (e: any) {
-        if (e.response?.status === 401 || e.response?.status === 403) {
+              } catch (e: unknown) {
+        const err = e as { response?: { status?: number }; message?: string };
+        if (err.response?.status === 401 || err.response?.status === 403) {
           toast.error("You are not authorized to edit this page");
           router.push(`/${slug}/careers`);
-        } else if (e.response?.status !== 404) { 
-          toast.error(e?.message || "Failed to load company");
+        } else if (err.response?.status !== 404) { 
+          toast.error(err?.message || "Failed to load company");
         }
       } finally {
         if (active) setLoading(false);
@@ -85,8 +86,8 @@ export default function CompanyEditPage() {
 
       try {
         await axiosInstance.put(`/api/company/${encodeURIComponent(slug)}`, payload);
-      } catch (e: any) {
-        if (e.response?.status === 404) {
+      } catch (e: unknown) {
+        if ((e as { response?: { status?: number } })?.response?.status === 404) {
           await axiosInstance.post("/api/company", payload);
         } else {
           throw e;
@@ -94,8 +95,8 @@ export default function CompanyEditPage() {
       }
 
       toast.success("Settings saved");
-    } catch (e: any) {
-      toast.error(e?.message || "Save failed");
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message || "Save failed");
     } finally {
       setSaving(false);
     }
@@ -113,8 +114,8 @@ export default function CompanyEditPage() {
       const updatedCompany = res.data;
       setIsPublished(updatedCompany.isPublished);
       toast.success(isPublished ? "Page unpublished" : "Page published! Share your careers link.");
-    } catch (e: any) {
-      toast.error(e?.message || "Publish failed");
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message || "Publish failed");
     } finally {
       setPublishing(false);
     }

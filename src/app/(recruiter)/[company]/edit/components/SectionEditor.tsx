@@ -1,7 +1,6 @@
 "use client";
 
 import { ContentSection } from "@/models/Company";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -34,7 +33,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
     setLocationsJson(JSON.stringify(section.data?.locations || [], null, 2));
     setPerksJson(JSON.stringify(section.data?.perks || [], null, 2));
     setJsonError("");
-  }, [section.id]);
+  }, [section.id, section.data?.values, section.data?.locations, section.data?.perks]);
 
   const renderTypeSpecificFields = () => {
     switch (section.type) {
@@ -98,7 +97,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
                   const values = JSON.parse(valuesJson);
                   onUpdate({ data: { ...section.data, values } });
                   setJsonError("");
-                } catch (err: any) {
+                } catch {
                   setJsonError("Invalid JSON in Values");
                 }
               }}
@@ -123,7 +122,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
                   const locations = JSON.parse(locationsJson);
                   onUpdate({ data: { ...section.data, locations } });
                   setJsonError("");
-                } catch (err: any) {
+                } catch {
                   setJsonError("Invalid JSON in Locations");
                 }
               }}
@@ -148,7 +147,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
                   const perks = JSON.parse(perksJson);
                   onUpdate({ data: { ...section.data, perks } });
                   setJsonError("");
-                } catch (err: any) {
+                } catch {
                   setJsonError("Invalid JSON in Perks");
                 }
               }}
@@ -198,7 +197,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
         {/* Styling Options */}
         <div className="space-y-2">
           <label className="text-sm font-medium">Alignment</label>
-          <Select value={section.alignment} onValueChange={(value: any) => onUpdate({ alignment: value })}>
+          <Select value={section.alignment} onValueChange={(value) => onUpdate({ alignment: value as 'left' | 'center' | 'right' })}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -212,7 +211,7 @@ export function SectionEditor({ section, onUpdate }: SectionEditorProps) {
 
         <div className="space-y-2">
           <label className="text-sm font-medium">Size</label>
-          <Select value={section.size} onValueChange={(value: any) => onUpdate({ size: value })}>
+          <Select value={section.size} onValueChange={(value) => onUpdate({ size: value as 'small' | 'medium' | 'large' })}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>

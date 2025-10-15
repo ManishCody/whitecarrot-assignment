@@ -66,7 +66,7 @@ export function CandidateSearch() {
                 <p className="text-xs text-muted-foreground mt-1">Try adjusting your search terms</p>
               </div>
             )}
-            {companies?.companies?.map((company: any, index: number) => (
+            {companies?.companies?.map((company: { _id: string; slug: string; name: string; jobCount: number; jobTitles: string[] }) => (
               <Link 
                 key={company._id} 
                 href={`/${company.slug}/careers`} 

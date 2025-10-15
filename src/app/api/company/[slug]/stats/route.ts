@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { Application } from '@/models/Application';
-import { Job, IJob } from '@/models/Job';
+import { Job } from '@/models/Job';
 import { connectDB } from '@/lib/db';
 import { requireAuthWithRole } from '@/lib/auth-helper';
 
@@ -11,14 +11,15 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     await connectDB();
 
     const { slug } = await params;
-    const jobs = await Job.find({ companySlug: slug }).lean();
-    const jobIds = jobs.map((job: IJob) => job._id);
+    const jobs = await (Job as any).find({ companySlug: slug }).lean();
+    const jobIds = jobs.map((job: any) => job._id);
 
-    const applicationCount = await Application.countDocuments({ job: { $in: jobIds } });
+    const applicationCount = await (Application as any).countDocuments({ job: { $in: jobIds } });
 
     return NextResponse.json({ applicationCount });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || 'Server error' }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || 'Server error' }, { status });
   }
 }

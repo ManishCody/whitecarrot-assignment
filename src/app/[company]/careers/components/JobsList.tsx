@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { axiosInstance } from "@/lib/axios";
 import { useAuthStore } from "@/store/auth";
 import { Skeleton } from "@/components/ui/skeleton";
+import { IJob } from "@/models/Job";
 
 export function JobsList({ slug }: { slug: string }) {
   const { user, isAuthenticated } = useAuthStore((s) => ({ user: s.user, isAuthenticated: s.isAuthenticated }));
@@ -17,7 +18,7 @@ export function JobsList({ slug }: { slug: string }) {
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState("");
   const [loading, setLoading] = useState(false);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<IJob[]>([]);
   const [applying, setApplying] = useState<string | null>(null);
   const [appliedJobs, setAppliedJobs] = useState<Set<string>>(new Set());
 
@@ -45,9 +46,9 @@ export function JobsList({ slug }: { slug: string }) {
         if (!active) return;
         const data = res.data;
         setJobs(Array.isArray(data.jobs) ? data.jobs : []);
-      } catch (e: any) {
-        if (!e?.message?.includes('Unauthorized')) {
-          toast.error(e?.message || "Failed to fetch jobs");
+      } catch (e: unknown) {
+        if (!(e as { message?: string })?.message?.includes('Unauthorized')) {
+          toast.error((e as { message?: string })?.message || "Failed to fetch jobs");
         }
       } finally {
         if (active) setLoading(false);
@@ -63,10 +64,10 @@ export function JobsList({ slug }: { slug: string }) {
     (async () => {
       try {
         const res = await axiosInstance.get('/api/applications/my-applications');
-        const appliedJobIds = res.data.map((app: any) => app.job?._id).filter(Boolean);
+        const appliedJobIds = res.data.map((app: { job?: { _id?: string } }) => app.job?._id).filter(Boolean);
         setAppliedJobs(new Set(appliedJobIds));
-      } catch (e: any) {
-        if (!e?.message?.includes('Unauthorized')) {
+      } catch (e: unknown) {
+        if (!(e as { message?: string })?.message?.includes('Unauthorized')) {
           console.error("Failed to fetch applied jobs", e);
         }
       }
@@ -79,8 +80,8 @@ export function JobsList({ slug }: { slug: string }) {
       await axiosInstance.post(`/api/jobs/${jobId}/apply`);
       toast.success("Application submitted!");
       setAppliedJobs(prev => new Set(prev).add(jobId));
-    } catch (err: any) {
-      toast.error(err?.response?.data?.error || "Failed to apply");
+    } catch (err: unknown) {
+      toast.error((err as { response?: { data?: { error?: string } } })?.response?.data?.error || "Failed to apply");
     } finally {
       setApplying(null);
     }
@@ -194,8 +195,8 @@ export function JobsList({ slug }: { slug: string }) {
           aria-label="Job listings"
           aria-live="polite"
         >
-          {jobs.map((job, index) => (
-            <Card key={job._id} className="p-4 sm:p-6 hover:shadow-md transition-shadow touch-manipulation focus-within:ring-2 focus-within:ring-blue-500">
+          {jobs.map((job) => (
+            <Card key={job._id as string} className="p-4 sm:p-6 hover:shadow-md transition-shadow touch-manipulation focus-within:ring-2 focus-within:ring-blue-500">
               <article className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-lg leading-tight mb-2" id={`job-title-${job._id}`}>{job.title}</h3>
@@ -220,13 +221,13 @@ export function JobsList({ slug }: { slug: string }) {
                   {isAuthenticated ? (
                     user?.role === 'CANDIDATE' && (
                       <Button 
-                        onClick={() => handleApply(job._id)}
-                        disabled={applying === job._id || appliedJobs.has(job._id)}
+                        onClick={() => handleApply(job._id as string)}
+                        disabled={applying === job._id || appliedJobs.has(job._id as string)}
                         className="w-full sm:w-auto min-w-[100px] touch-manipulation"
                         size="sm"
                         aria-describedby={`job-title-${job._id}`}
                         aria-label={
-                          appliedJobs.has(job._id) 
+                          appliedJobs.has(job._id as string) 
                             ? `Already applied to ${job.title}` 
                             : applying === job._id 
                               ? `Submitting application for ${job.title}` 
@@ -234,7 +235,7 @@ export function JobsList({ slug }: { slug: string }) {
                         }
                       >
                         {applying === job._id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                        {appliedJobs.has(job._id) ? '✓ Applied' : (applying === job._id ? 'Applying...' : 'Apply Now')}
+                        {appliedJobs.has(job._id as string) ? '✓ Applied' : (applying === job._id ? 'Applying...' : 'Apply Now')}
                       </Button>
                     )
                   ) : (

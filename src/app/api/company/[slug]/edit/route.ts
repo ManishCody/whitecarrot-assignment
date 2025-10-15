@@ -23,7 +23,7 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
         const decoded = verifyJwt(token);
         userId = decoded.sub;
         userRole = decoded.role;
-      } catch (error) {
+      } catch (_error) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }
@@ -35,8 +35,9 @@ export async function GET(req: Request, { params }: { params: Promise<{ slug: st
     const { slug } = await params;
     const company = await getCompanyBySlugForEdit(slug, userId);
     return NextResponse.json(company, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

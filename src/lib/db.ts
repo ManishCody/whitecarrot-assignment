@@ -13,7 +13,7 @@ declare global {
   } | undefined;
 }
 
-let cached = global.mongooseConn || { conn: null, promise: null };
+const cached = global.mongooseConn || { conn: null, promise: null };
 global.mongooseConn = cached;
 
 export async function connectDB() {

@@ -18,8 +18,9 @@ export async function POST(req: NextRequest) {
     }
     const created = await createCompany(body);
     return NextResponse.json(created, { status: 201 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

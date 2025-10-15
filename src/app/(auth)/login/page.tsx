@@ -1,8 +1,8 @@
 "use client";
-import React from "react";
+import React, { Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -19,9 +19,9 @@ const LoginSchema = z.object({
   password: z.string().min(6, "Minimum 6 characters"),
 });
 
-type LoginValues = z.infer<typeof LoginSchema>;
+interface LoginValues extends FieldValues, z.infer<typeof LoginSchema> {}
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const login = useAuthStore((s: AuthState) => s.login);
@@ -40,8 +40,8 @@ export default function LoginPage() {
       const nextParam = searchParams.get("next");
       const nextPath = nextParam ? decodeURIComponent(nextParam) : "/dashboard";
       router.push(nextPath);
-    } catch (err: any) {
-      const message = err?.response?.data?.error || err?.message || "Login failed";
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error || (err as { message?: string })?.message || "Login failed";
       form.setError("password", { type: "server", message });
       toast.error(message);
     }
@@ -54,7 +54,7 @@ export default function LoginPage() {
         <CardDescription>Login to continue</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...(form as any)}>
+        <Form {...(form as unknown as UseFormReturn<FieldValues>)}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}
@@ -90,11 +90,33 @@ export default function LoginPage() {
         </Form>
       </CardContent>
       <CardFooter className="justify-center text-sm text-muted-foreground">
-        <span>Don't have an account? </span>
+        <span>Don&apos;t have an account? </span>
         <Link href="/register" className="ml-1 underline">
           Register
         </Link>
       </CardFooter>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <Card>
+        <CardHeader>
+          <CardTitle>Welcome back</CardTitle>
+          <CardDescription>Login to continue</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            <div className="h-10 bg-muted animate-pulse rounded" />
+            <div className="h-10 bg-muted animate-pulse rounded" />
+            <div className="h-10 bg-muted animate-pulse rounded" />
+          </div>
+        </CardContent>
+      </Card>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

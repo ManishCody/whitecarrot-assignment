@@ -12,8 +12,8 @@ export async function POST(req: Request) {
     }
     const data = await registerUser({ name, email, password, recruiterCode });
     return NextResponse.json(data, { status: 201 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status || 500;
+    return NextResponse.json({ error: (err as { message?: string })?.message || "Server error" }, { status });
   }
 }

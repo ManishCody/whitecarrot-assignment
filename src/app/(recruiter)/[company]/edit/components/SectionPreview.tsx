@@ -1,6 +1,7 @@
 "use client";
 
 import { ContentSection } from "@/models/Company";
+import Image from 'next/image';
 
 interface SectionPreviewProps {
   section: ContentSection;
@@ -39,9 +40,11 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
             <div className="absolute inset-0 bg-black/40" />
             <div className="relative z-10 max-w-4xl mx-auto px-4 text-center text-white">
               {company?.logoUrl ? (
-                <img
+                <Image
                   src={company.logoUrl}
                   alt="Company logo"
+                  width={64}
+                  height={64}
                   className="mx-auto mb-4 h-16 w-16 rounded-md bg-white/90 p-2 shadow"
                 />
               ) : null}
@@ -68,9 +71,11 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
               <h2 className="text-2xl md:text-3xl font-bold mb-6">{section.title}</h2>
             )}
             {section.imageUrl && (
-              <img 
+              <Image 
                 src={section.imageUrl} 
                 alt={section.title || 'Section image'}
+                width={1200}
+                height={675}
                 className="w-full rounded-lg"
               />
             )}
@@ -92,12 +97,12 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
         );
 
       case 'values':
-        const values = section.data?.values || [];
+        const values = (section.data?.values ?? []) as { title: string; description: string }[];
         return (
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center">{section.title}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-              {values.map((value: any, index: number) => (
+              {(values as any).map((value: { title: string; description: string }, index: number) => (
                 <div key={index} className="text-center">
                   <div className="w-16 h-16 bg-blue-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
                     <span className="text-2xl">🎯</span>
@@ -111,12 +116,12 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
         );
 
       case 'locations':
-        const locations = section.data?.locations || [];
+        const locations = (section.data?.locations ?? []) as { city: string; address: string }[];
         return (
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center">{section.title}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {locations.map((location: any, index: number) => (
+              {locations.map((location: { city: string; address: string }, index: number) => (
                 <div key={index} className="bg-yellow-50 rounded-lg p-6">
                   <div className="w-16 h-16 bg-yellow-200 rounded-lg mb-4 flex items-center justify-center">
                     <span className="text-2xl">🏢</span>
@@ -130,12 +135,12 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
         );
 
       case 'perks':
-        const perks = section.data?.perks || [];
+        const perks = (section.data?.perks ?? []) as { title: string; description: string }[];
         return (
           <div className="max-w-6xl mx-auto px-4">
             <h2 className="text-2xl md:text-3xl font-bold mb-12 text-center">{section.title}</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {perks.map((perk: any, index: number) => (
+              {perks.map((perk: { title: string; description: string }, index: number) => (
                 <div key={index} className="text-center">
                   <div className="w-16 h-16 bg-green-100 rounded-lg mx-auto mb-4 flex items-center justify-center">
                     <span className="text-2xl">✨</span>
@@ -152,7 +157,7 @@ export function SectionPreview({ section, company }: SectionPreviewProps) {
         return (
           <div className="max-w-4xl mx-auto px-4">
             <div className="bg-gray-50 rounded-lg p-8">
-              <blockquote className="text-lg italic mb-4">"{section.content}"</blockquote>
+              <blockquote className="text-lg italic mb-4">&quot;{section.content}&quot;</blockquote>
               <cite className="font-semibold">— {section.title}</cite>
             </div>
           </div>

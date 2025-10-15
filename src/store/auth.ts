@@ -21,7 +21,7 @@ export type AuthState = {
 };
 
 
-const creator: StateCreator<AuthState> = (set, get) => ({
+const creator: StateCreator<AuthState> = (set, _get) => ({
     user: null,
     isAuthenticated: false,
     loading: true,
@@ -34,8 +34,8 @@ const creator: StateCreator<AuthState> = (set, get) => ({
     logout: async () => {
       try {
         await axiosInstance.post("/api/auth/logout");
-      } catch (error) {
-        console.error("Logout failed", error);
+      } catch (_error) {
+        console.error("Logout failed");
       } finally {
         set({ user: null, isAuthenticated: false, loading: false });
       }
@@ -44,7 +44,7 @@ const creator: StateCreator<AuthState> = (set, get) => ({
       try {
         const { data } = await axiosInstance.get("/api/auth/me");
         set({ user: data, isAuthenticated: true, loading: false });
-      } catch (error) {
+      } catch (_error) {
         set({ user: null, isAuthenticated: false, loading: false });
       }
     },

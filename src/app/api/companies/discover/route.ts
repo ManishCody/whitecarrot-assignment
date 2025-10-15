@@ -10,8 +10,9 @@ export async function GET(req: Request) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const data = await getDiscoverCompanies(page, limit);
     return NextResponse.json(data, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

@@ -7,7 +7,7 @@ import { Types } from "mongoose";
 
 export async function getMyApplications(userId: string) {
   await connectDB();
-  const applications = await Application.find({ candidate: userId })
+  const applications = await (Application as any).find({ candidate: userId })
     .populate({ path: 'job', model: Job, select: 'title' })
     .lean();
   return applications;
@@ -15,15 +15,15 @@ export async function getMyApplications(userId: string) {
 
 export async function getApplicationsByCompany(companySlug: string) {
   await connectDB();
-  const company = await Company.findOne({ slug: companySlug });
+  const company = await (Company as any).findOne({ slug: companySlug });
   if (!company) {
     throw new Error('Company not found');
   }
 
-  const jobs: { _id: string }[] = await Job.find({ companyId: company._id }).lean();
+  const jobs: { _id: string }[] = await (Job as any).find({ companyId: company._id }).lean();
   const jobIds = jobs.map(job => job._id);
 
-  const applications = await Application.find({ job: { $in: jobIds } })
+  const applications = await (Application as any).find({ job: { $in: jobIds } })
     .populate({ path: 'candidate', model: User, select: 'name email' })
     .populate({ path: 'job', model: Job, select: 'title' })
     .lean();
@@ -33,6 +33,6 @@ export async function getApplicationsByCompany(companySlug: string) {
 
 export async function getMyApplicationJobIds(userId: string) {
   await connectDB();
-  const applications = await Application.find({ candidate: userId }).select("job").lean();
+  const applications = await (Application as any).find({ candidate: userId }).select("job").lean();
   return applications.map((app: { job: Types.ObjectId | string }) => String(app.job));
 }

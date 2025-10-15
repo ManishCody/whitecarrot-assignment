@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { Loader2 } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -8,6 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { axiosInstance } from "@/lib/axios";
 import { toast } from "sonner";
+import { IJob } from "@/models/Job";
 
 interface JobsAdminProps {
   slug: string;
@@ -16,7 +17,7 @@ interface JobsAdminProps {
 export function JobsAdmin({ slug }: JobsAdminProps) {
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<IJob[]>([]);
   const [deletingJobId, setDeletingJobId] = useState<string | null>(null);
 
   // form fields
@@ -44,7 +45,7 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
     );
   }, [title, workPolicy, location, department, employmentType, experience, jobType, salaryRange, slugField]);
 
-  const resetForm = () => {
+  const resetForm = useCallback(() => {
     setTitle("");
     setWorkPolicy("Remote");
     setLocation("");
@@ -54,23 +55,23 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
     setJobType("Full-time");
     setSalaryRange("");
     setSlugField("");
-  };
+  }, []);
 
-  const loadJobs = async () => {
+  const loadJobs = useCallback(async () => {
     setLoading(true);
     try {
       const res = await axiosInstance.get(`/api/jobs?slug=${encodeURIComponent(slug)}`);
       setJobs(Array.isArray(res.data.jobs) ? res.data.jobs : []);
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to load jobs");
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message || "Failed to load jobs");
     } finally {
       setLoading(false);
     }
-  };
+  }, [slug]);
 
   useEffect(() => {
     loadJobs();
-  }, [slug]);
+  }, [loadJobs]);
 
   const onCreate = async () => {
     if (!canSubmit) return;
@@ -98,8 +99,8 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
       toast.success("Job created");
       resetForm();
       await loadJobs();
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to create job");
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message || "Failed to create job");
     } finally {
       setSubmitting(false);
     }
@@ -111,8 +112,8 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
       await axiosInstance.delete(`/api/jobs/${id}`);
       toast.success("Job deleted");
       await loadJobs();
-    } catch (e: any) {
-      toast.error(e?.message || "Failed to delete job");
+    } catch (e: unknown) {
+      toast.error((e as { message?: string })?.message || "Failed to delete job");
     } finally {
       setDeletingJobId(null);
     }
@@ -193,8 +194,8 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
             <p className="text-sm text-muted-foreground">No jobs yet. Create your first job using the form.</p>
           ) : (
             <ul className="divide-y rounded-md border">
-              {jobs.map((job) => (
-                <li key={job._id} className="p-4">
+              {jobs.map((job,idx) => (
+                <li key={idx} className="p-4">
                   <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                       <div className="font-medium">{job.title}</div>
@@ -206,7 +207,7 @@ export function JobsAdmin({ slug }: JobsAdminProps) {
                       <Button 
                         variant="destructive" 
                         size="sm" 
-                        onClick={() => onDelete(job._id)}
+                        onClick={() => onDelete(job._id as string)}
                         disabled={deletingJobId === job._id}
                       >
                         {deletingJobId === job._id && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}

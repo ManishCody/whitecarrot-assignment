@@ -11,18 +11,18 @@ export async function listJobs(filters: {
 }) {
   await connectDB();
 
-  const company = await Company.findOne({ slug: filters.companySlug });
+  const company = await (Company  as any).findOne({ slug: filters.companySlug });
   if (!company) {
     throw Object.assign(new Error("Company not found"), { status: 404 });
   }
 
-  const query: Record<string, any> = { companyId: company._id };
+  const query: Record<string, unknown> = { companyId: company._id };
   if (filters.location) query.location = filters.location;
   if (filters.jobType) query.jobType = filters.jobType;
   if (filters.department) query.department = filters.department;
   if (filters.title) query.title = { $regex: filters.title, $options: "i" };
 
-  const jobs = await Job.find(query).sort({ createdAt: -1 });
+  const jobs = await (Job as any).find(query).sort({ createdAt: -1 });
   return { company, jobs };
 }
 
@@ -41,12 +41,12 @@ export async function createJob(input: {
 }) {
   await connectDB();
 
-  const company = await Company.findOne({ slug: input.companySlug });
+  const company = await (Company as any).findOne({ slug: input.companySlug });
   if (!company) {
     throw Object.assign(new Error("Company not found"), { status: 404 });
   }
 
-  const job = await Job.create({
+  const job = await (Job as any).create({
     title: input.title,
     workPolicy: input.workPolicy,
     location: input.location,
@@ -81,10 +81,10 @@ export async function updateJob(
 
   const patch: typeof input = { ...input };
   if (patch.postedDaysAgo !== undefined && patch.postedDaysAgo !== null) {
-    (patch as any).postedDaysAgo = Number(patch.postedDaysAgo) || 0;
+    (patch as { postedDaysAgo: number }).postedDaysAgo = Number(patch.postedDaysAgo) || 0;
   }
 
-  const job = await Job.findByIdAndUpdate(id, { $set: patch }, { new: true });
+  const job = await (Job  as any).findByIdAndUpdate(id, { $set: patch }, { new: true });
   if (!job) {
     throw Object.assign(new Error("Job not found"), { status: 404 });
   }
@@ -93,7 +93,7 @@ export async function updateJob(
 
 export async function deleteJob(id: string) {
   await connectDB();
-  const job = await Job.findByIdAndDelete(id);
+  const job = await (Job as any).findByIdAndDelete(id);
   if (!job) {
     throw Object.assign(new Error("Job not found"), { status: 404 });
   }

@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import { useForm, FieldValues, UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
@@ -29,7 +29,7 @@ const RegisterSchema = z
     path: ["confirmPassword"],
   });
 
-type RegisterValues = z.infer<typeof RegisterSchema>;
+interface RegisterValues extends FieldValues, z.infer<typeof RegisterSchema> {}
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -52,8 +52,8 @@ export default function RegisterPage() {
       login({ user: data.user });
       toast.success("Account created successfully");
       router.push("/");
-    } catch (err: any) {
-      const message = err?.response?.data?.error || err?.message || "Registration failed";
+    } catch (err: unknown) {
+      const message = (err as { response?: { data?: { error?: string } }; message?: string })?.response?.data?.error || (err as { message?: string })?.message || "Registration failed";
       form.setError("confirmPassword", { type: "server", message });
       toast.error(message);
     }
@@ -66,7 +66,7 @@ export default function RegisterPage() {
         <CardDescription>Sign up to get started</CardDescription>
       </CardHeader>
       <CardContent>
-        <Form {...(form as any)}>
+        <Form {...(form as unknown as UseFormReturn<FieldValues>)}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
               control={form.control}

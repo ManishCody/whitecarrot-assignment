@@ -7,8 +7,9 @@ export async function GET(req: Request) {
     const query = searchParams.get("q") || "";
     const jobs = await searchJobs(query);
     return NextResponse.json(jobs, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

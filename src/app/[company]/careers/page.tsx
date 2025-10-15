@@ -73,13 +73,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 export default async function CareersPage({ params }: PageProps) {
   const companySlug = (await params).company;
 
-  let company: any = null;
+  let company: { name: string; isPublished: boolean; sections?: ContentSection[]; bannerUrl?: string; logoUrl?: string; cultureVideo?: string } | null = null;
   let sections: ContentSection[] = [];
   
   try {
     company = await getCompanyBySlug(companySlug);
     sections = Array.isArray(company?.sections) ? company.sections : [];
-  } catch (e) {
+  } catch {
   }
 
   if (!company) {
@@ -88,7 +88,7 @@ export default async function CareersPage({ params }: PageProps) {
         <div className="text-center py-20">
           <h1 className="text-2xl font-semibold mb-4">Company Not Found</h1>
           <p className="text-muted-foreground">
-            The careers page for "{companySlug}" could not be found.
+            The careers page for &quot;{companySlug}&quot; could not be found.
           </p>
         </div>
       </div>
@@ -101,7 +101,7 @@ export default async function CareersPage({ params }: PageProps) {
         <div className="text-center py-20">
           <h1 className="text-2xl font-semibold mb-4">Coming Soon</h1>
           <p className="text-muted-foreground">
-            {company.name}'s careers page is not yet published.
+            {company.name}&apos;s careers page is not yet published.
           </p>
         </div>
       </div>
@@ -156,7 +156,7 @@ export default async function CareersPage({ params }: PageProps) {
 
             <section className="prose prose-lg max-w-none mb-12">
               <p>
-                We're building the future and looking for talented individuals to join our team. 
+                We&apos;re building the future and looking for talented individuals to join our team. 
                 Explore our open roles below and discover how you can make an impact.
               </p>
             </section>
@@ -165,7 +165,7 @@ export default async function CareersPage({ params }: PageProps) {
         <section className="bg-gray-50 py-16">
           <div className="mx-auto w-full max-w-5xl px-4 sm:px-6">
             <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold mb-4">Join the team, we're hiring!</h2>
+              <h2 className="text-2xl font-bold mb-4">Join the team, we&apos;re hiring!</h2>
               <p className="text-muted-foreground">
                 Explore our open positions and find your next opportunity.
               </p>

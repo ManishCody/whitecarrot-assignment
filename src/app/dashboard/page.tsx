@@ -20,14 +20,14 @@ export default function DashboardPage() {
   const { user, loading: isAuthLoading } = useAuthStore((s) => ({ user: s.user, loading: s.loading }));
   const router = useRouter();
   const [stats, setStats] = useState({ totalCompanies: 0, totalJobs: 0, totalApplications: 0 });
-  const [applications, setApplications] = useState<any[]>([]);
-  const [companies, setCompanies] = useState<any[]>([]);
+  const [applications, setApplications] = useState<{ _id: string; job: { title: string }; status: string }[]>([]);
+  const [companies, setCompanies] = useState<{ _id: string; name: string; slug: string; isPublished: boolean }[]>([]);
   const [loading, setLoading] = useState(true);
   const [createCompanyOpen, setCreateCompanyOpen] = useState(false);
   const [newCompanyName, setNewCompanyName] = useState("");
   const [viewApplicationsOpen, setViewApplicationsOpen] = useState(false);
-  const [selectedCompany, setSelectedCompany] = useState<any>(null);
-  const [companyApplications, setCompanyApplications] = useState<any[]>([]);
+  const [selectedCompany, setSelectedCompany] = useState<{ name: string } | null>(null);
+  const [companyApplications, setCompanyApplications] = useState<unknown[]>([]);
   const [loadingApplications, setLoadingApplications] = useState(false);
   const [creatingCompany, setCreatingCompany] = useState(false);
 
@@ -65,15 +65,15 @@ export default function DashboardPage() {
     fetchData();
   }, [user, isAuthLoading, router]);
 
-  const handleViewApplications = async (company: any) => {
+  const handleViewApplications = async (company: { slug: string; name: string }) => {
     setSelectedCompany(company);
     setViewApplicationsOpen(true);
     setLoadingApplications(true);
     try {
       const res = await axiosInstance.get(`/api/company/${company.slug}/applications`);
       setCompanyApplications(res.data);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to load applications");
+    } catch (err: unknown) {
+      toast.error((err as { message: string }).message || "Failed to load applications");
     } finally {
       setLoadingApplications(false);
     }
@@ -88,7 +88,7 @@ export default function DashboardPage() {
     setCreatingCompany(true);
     try {
       const slug = newCompanyName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-      const res = await axiosInstance.post('/api/companies', {
+      await axiosInstance.post('/api/companies', {
         name: newCompanyName,
         slug: slug
       });
@@ -98,8 +98,8 @@ export default function DashboardPage() {
       setNewCompanyName("");
       
       router.push(`/${slug}/edit`);
-    } catch (err: any) {
-      toast.error(err.message || "Failed to create company");
+    } catch (err: unknown) {
+      toast.error((err as { message: string }).message || "Failed to create company");
     } finally {
       setCreatingCompany(false);
     }

@@ -6,18 +6,18 @@ export type UpsertCompanyInput = Partial<ICompany>;
 
 export async function getCompaniesByCreator(userId: string) {
   await connectDB();
-  return Company.find({ createdBy: userId }).lean();
+  return (Company as any).find({ createdBy: userId }).lean();
 }
 
 export async function createCompany(data: { name: string; slug: string; createdBy: string }) {
   await connectDB();
   
-  const existingCompany = await Company.findOne({ slug: data.slug });
+  const existingCompany = await (Company as any).findOne({ slug: data.slug });
   if (existingCompany) {
     throw Object.assign(new Error("Company with this slug already exists"), { status: 400 });
   }
   
-  const company = await Company.create({
+  const company = await (Company as any).create({
     name: data.name,
     slug: data.slug,
     createdBy: data.createdBy,
@@ -33,14 +33,14 @@ export async function createCompany(data: { name: string; slug: string; createdB
 export async function getDiscoverCompanies(page: number = 1, limit: number = 10) {
   await connectDB();
   const skip = (page - 1) * limit;
-  const companies = await Company.find({ isPublished: true })
+  const companies = await (Company as any).find({ isPublished: true })
     .select('name slug')
     .skip(skip)
     .limit(limit)
     .lean();
 
   const companyIds = companies.map((c: ICompany) => c._id);
-  const jobs: IJob[] = await Job.find({ companyId: { $in: companyIds } }).select('title companyId').lean();
+  const jobs: IJob[] = await (Job as any).find({ companyId: { $in: companyIds } }).select('title companyId').lean();
 
   const companiesWithJobData = companies.map((company: ICompany) => {
     const companyJobs = jobs.filter((job: IJob) => String(job.companyId) === String(company._id));
@@ -51,13 +51,13 @@ export async function getDiscoverCompanies(page: number = 1, limit: number = 10)
     };
   });
 
-  const total = await Company.countDocuments({ isPublished: true });
+  const total = await (Company as any).countDocuments({ isPublished: true });
   return { companies: companiesWithJobData, total, page, limit };
 }
 
 export async function getCompanyBySlugForEdit(slug: string, userId: string) {
   await connectDB();
-  const company = await Company.findOne({ slug });
+  const company = await (Company as any).findOne({ slug });
   if (!company) {
     throw Object.assign(new Error("Company not found"), { status: 404 });
   }
@@ -69,14 +69,14 @@ export async function getCompanyBySlugForEdit(slug: string, userId: string) {
 
 export async function getCompanyBySlug(slug: string) {
   await connectDB();
-  return Company.findOne({ slug }).lean();
+  return (Company as any).findOne({ slug }).lean();
 }
 
 
 
 export async function updateCompanyBySlug(slug: string, input: Partial<UpsertCompanyInput>, userId: string) {
   await connectDB();
-  const company = await Company.findOneAndUpdate({ slug, createdBy: userId }, { $set: input }, { new: true });
+  const company = await (Company as any).findOneAndUpdate({ slug, createdBy: userId }, { $set: input }, { new: true });
   if (!company) {
     throw Object.assign(new Error("Company not found"), { status: 404 });
   }
@@ -85,7 +85,7 @@ export async function updateCompanyBySlug(slug: string, input: Partial<UpsertCom
 
 export async function publishCompanyBySlug(slug: string) {
   await connectDB();
-  const company = await Company.findOneAndUpdate(
+  const company = await (Company as any).findOneAndUpdate(
     { slug },
     { $set: { isPublished: true, publishedAt: new Date() } },
     { new: true }
@@ -100,12 +100,12 @@ export async function publishCompanyBySlug(slug: string) {
 export async function searchCompaniesByJobTitle(query: string) {
   await connectDB();
 
-  const jobs = await Job.find({ title: { $regex: query, $options: 'i' } }).select('companyId').lean();
+  const jobs = await (Job as any).find({ title: { $regex: query, $options: 'i' } }).select('companyId').lean();
   const companyIds = [...new Set(jobs.map((job: IJob) => job.companyId))];
 
-  const companies = await Company.find({ _id: { $in: companyIds }, isPublished: true }).select('name slug').lean();
+  const companies = await (Company as any).find({ _id: { $in: companyIds }, isPublished: true }).select('name slug').lean();
 
-  const allJobs: IJob[] = await Job.find({ companyId: { $in: companyIds } }).select('title companyId').lean();
+  const allJobs: IJob[] = await (Job as any).find({ companyId: { $in: companyIds } }).select('title companyId').lean();
 
   const companiesWithJobData = companies.map((company: ICompany) => {
     const companyJobs = allJobs.filter((job: IJob) => String(job.companyId) === String(company._id));
@@ -121,7 +121,7 @@ export async function searchCompaniesByJobTitle(query: string) {
 
 export async function unpublishCompanyBySlug(slug: string) {
   await connectDB();
-  const company = await Company.findOneAndUpdate(
+  const company = await (Company as any).findOneAndUpdate(
     { slug },
     { $set: { isPublished: false }, $unset: { publishedAt: 1 } },
     { new: true }

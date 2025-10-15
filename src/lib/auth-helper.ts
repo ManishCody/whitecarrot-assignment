@@ -24,7 +24,7 @@ export async function getAuthenticatedUser(): Promise<AuthResult> {
         const decoded = verifyJwt(token);
         userId = decoded.sub;
         role = decoded.role;
-      } catch (error) {
+      } catch (_error) {
         return null;
       }
     }
@@ -34,7 +34,7 @@ export async function getAuthenticatedUser(): Promise<AuthResult> {
     }
 
     return { userId, role };
-  } catch (error) {
+  } catch (_error) {
     return null;
   }
 }

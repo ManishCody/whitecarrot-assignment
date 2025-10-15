@@ -12,9 +12,10 @@ export async function GET(_req: Request, { params }: { params: Promise<{ slug: s
     const company = await getCompanyBySlug(slug);
     if (!company) return NextResponse.json({ error: "Company not found" }, { status: 404 });
     return NextResponse.json(company, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }
 
@@ -26,7 +27,6 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
     
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
-    let userRole = (await headerList).get('x-user-role');
 
     if (!userId) {
       const cookieStore = cookies();
@@ -39,8 +39,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
       try {
         const decoded = verifyJwt(token);
         userId = decoded.sub;
-        userRole = decoded.role;
-      } catch (error) {
+      } catch (_error) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
     }
@@ -50,8 +49,9 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
     }
     const updated = await updateCompanyBySlug(slug, body, userId);
     return NextResponse.json(updated, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

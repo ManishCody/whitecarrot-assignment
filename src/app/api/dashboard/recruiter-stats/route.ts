@@ -5,7 +5,7 @@ import { verifyJwt } from "@/lib/auth";
 
 
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         const decoded = verifyJwt(token);
         userId = decoded.sub;
         role = decoded.role;
-      } catch (error) {
+      } catch (_error) {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
       }
     }
@@ -34,8 +34,9 @@ export async function GET(req: NextRequest) {
 
     const stats = await getRecruiterDashboardStats(userId);
     return NextResponse.json(stats);
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

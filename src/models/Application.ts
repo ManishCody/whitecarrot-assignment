@@ -1,6 +1,12 @@
-import { Schema, models, model } from "mongoose";
+import { Schema, models, model, Model, Document, Types } from "mongoose";
 
-const ApplicationSchema = new Schema(
+export interface IApplication extends Document {
+  job: Types.ObjectId;
+  candidate: Types.ObjectId;
+  status: "APPLIED" | "REVIEWED" | "INTERVIEWING" | "OFFERED" | "REJECTED";
+}
+
+const ApplicationSchema = new Schema<IApplication>(
   {
     job: { type: Schema.Types.ObjectId, ref: "Job", required: true },
     candidate: { type: Schema.Types.ObjectId, ref: "User", required: true },
@@ -13,11 +19,5 @@ const ApplicationSchema = new Schema(
   { timestamps: true }
 );
 
-export type IApplication = {
-  _id: string;
-  job: string;
-  candidate: string;
-  status: "APPLIED" | "REVIEWED" | "INTERVIEWING" | "OFFERED" | "REJECTED";
-};
-
-export const Application = (models as any).Application || model("Application", ApplicationSchema);
+export const Application: Model<IApplication> =
+  models.Application || model<IApplication>("Application", ApplicationSchema);

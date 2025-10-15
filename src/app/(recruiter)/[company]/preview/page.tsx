@@ -18,7 +18,7 @@ export default function CompanyPreviewPage() {
   const slug = useMemo(() => params?.company ?? "company", [params]);
   
   const [loading, setLoading] = useState(true);
-  const [company, setCompany] = useState<any>(null);
+  const [company, setCompany] = useState<{ name?: string; isPublished?: boolean; bannerUrl?: string; logoUrl?: string; cultureVideo?: string } | null>(null);
   const [sections, setSections] = useState<ContentSection[]>([]);
 
   useEffect(() => {
@@ -38,12 +38,13 @@ export default function CompanyPreviewPage() {
         const c = res.data;
         setCompany(c);
         setSections(Array.isArray(c.sections) ? c.sections : []);
-      } catch (e: any) {
-        if (e.response?.status === 401 || e.response?.status === 403) {
+      } catch (e: unknown) {
+        const err = e as { response?: { status?: number }; message?: string };
+        if (err.response?.status === 401 || err.response?.status === 403) {
           toast.error("You are not authorized to preview this page");
           router.push(`/${slug}/careers`);
         } else {
-          toast.error(e?.message || "Failed to load company");
+          toast.error(err?.message || "Failed to load company");
         }
       } finally {
         if (active) setLoading(false);

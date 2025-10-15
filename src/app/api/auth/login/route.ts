@@ -20,8 +20,8 @@ export async function POST(req: Request) {
       maxAge: 60 * 60 * 24 * 7 
     });
     return response;
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const status = (err as { status?: number })?.status || 500;
+    return NextResponse.json({ error: (err as { message?: string })?.message || "Server error" }, { status });
   }
 }

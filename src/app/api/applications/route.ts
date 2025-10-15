@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Application } from '@/models/Application';
 import { connectDB } from '@/lib/db';
 
-export const runtime = 'nodejs';
+
 
 export async function GET(req: NextRequest) {
   try {
@@ -13,11 +13,12 @@ export async function GET(req: NextRequest) {
 
     await connectDB();
 
-    const applications = await Application.find({ candidate: userId }).populate('job').lean();
+    const applications = await (Application as any).find({ candidate: userId }).populate('job').lean();
 
     return NextResponse.json(applications);
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || 'Server error' }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || 'Server error' }, { status });
   }
 }

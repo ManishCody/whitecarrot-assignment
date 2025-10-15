@@ -1,6 +1,20 @@
-import { Schema, models, model } from "mongoose";
+import { Schema, models, model, Model, Document, Types } from "mongoose";
 
-const JobSchema = new Schema(
+export interface IJob extends Document {
+  title: string;
+  workPolicy: string;
+  location: string;
+  department: string;
+  employmentType: string;
+  experience: string;
+  jobType: string;
+  salaryRange: string;
+  slug: string;
+  postedDaysAgo: number;
+  companyId: Types.ObjectId;
+}
+
+const JobSchema = new Schema<IJob>(
   {
     title: { type: String, required: true },
     workPolicy: { type: String, required: true },
@@ -12,24 +26,15 @@ const JobSchema = new Schema(
     salaryRange: { type: String, required: true },
     slug: { type: String, required: true },
     postedDaysAgo: { type: Number, default: 0 },
-    companyId: { type: Schema.Types.ObjectId, ref: "Company", required: true, index: true },
+    companyId: {
+      type: Schema.Types.ObjectId,
+      ref: "Company",
+      required: true,
+      index: true,
+    },
   },
   { timestamps: true }
 );
 
-export type IJob = {
-  _id: string;
-  title: string;
-  workPolicy: string;
-  location: string;
-  department: string;
-  employmentType: string;
-  experience: string;
-  jobType: string;
-  salaryRange: string;
-  slug: string;
-  postedDaysAgo: number;
-  companyId: string;
-};
-
-export const Job = (models as any).Job || model("Job", JobSchema);
+export const Job: Model<IJob> =
+  models.Job || model<IJob>("Job", JobSchema);

@@ -12,8 +12,9 @@ export async function GET(req: Request) {
     }
     const companies = await searchCompaniesByJobTitle(query);
     return NextResponse.json(companies, { status: 200 });
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || "Server error" }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || "Server error" }, { status });
   }
 }

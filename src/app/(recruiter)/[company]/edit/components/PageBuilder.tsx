@@ -78,7 +78,7 @@ function SortableItem({
   );
 }
 
-export function PageBuilder({ sections, onSectionsChange, companySlug, loading }: PageBuilderProps) {
+export function PageBuilder({ sections, onSectionsChange, loading }: PageBuilderProps) {
   const [selectedSection, setSelectedSection] = useState<string | null>(null);
   const [previewMode, setPreviewMode] = useState(false);
 

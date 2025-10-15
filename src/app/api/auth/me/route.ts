@@ -5,7 +5,7 @@ import { verifyJwt } from "@/lib/auth";
 
 
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const headerList = headers();
     let userId = (await headerList).get('x-user-id');
@@ -21,7 +21,7 @@ export async function GET(req: NextRequest) {
       try {
         const decoded = verifyJwt(token);
         userId = decoded.sub;
-      } catch (error) {
+      } catch (_error) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
       }
     }
@@ -37,7 +37,7 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json(user);
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+  } catch (err: unknown) {
+    return NextResponse.json({ error: (err as { message?: string })?.message }, { status: 500 });
   }
 }

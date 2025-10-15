@@ -3,8 +3,6 @@ import { Application } from '@/models/Application';
 import { connectDB } from '@/lib/db';
 import { requireAuthWithRole } from '@/lib/auth-helper';
 
-export const runtime = 'nodejs';
-
 export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
     await requireAuthWithRole('RECRUITER');
@@ -30,8 +28,9 @@ export async function PUT(req: Request, { params }: { params: Promise<{ id: stri
     }
 
     return NextResponse.json(updatedApplication);
-  } catch (err: any) {
-    const status = err?.status || 500;
-    return NextResponse.json({ error: err?.message || 'Server error' }, { status });
+  } catch (err: unknown) {
+    const error = err as { status?: number; message?: string };
+    const status = error?.status || 500;
+    return NextResponse.json({ error: error?.message || 'Server error' }, { status });
   }
 }

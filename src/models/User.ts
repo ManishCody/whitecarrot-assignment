@@ -1,6 +1,14 @@
-import { Schema, models, model } from "mongoose";
+import { Schema, models, model, Model, Document } from "mongoose";
 
-const UserSchema = new Schema(
+export interface IUser extends Document {
+  name: string;
+  email: string;
+  passwordHash: string;
+  companies?: string[];
+  role: "CANDIDATE" | "RECRUITER";
+}
+
+const UserSchema = new Schema<IUser>(
   {
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true, index: true },
@@ -15,13 +23,5 @@ const UserSchema = new Schema(
   { timestamps: true }
 );
 
-export type IUser = {
-  _id: string;
-  name: string;
-  email: string;
-  passwordHash: string;
-  companies?: string[];
-  role: "CANDIDATE" | "RECRUITER";
-};
-
-export const User = (models as any).User || model("User", UserSchema);
+export const User: Model<IUser> =
+  models.User || model<IUser>("User", UserSchema);

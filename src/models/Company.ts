@@ -1,4 +1,4 @@
-import { Schema, models, model } from "mongoose";
+import { Schema, models, model, Model } from "mongoose";
 
 export type ContentSection = {
   id: string;
@@ -11,7 +11,7 @@ export type ContentSection = {
   textColor?: string;
   alignment?: 'left' | 'center' | 'right';
   size?: 'small' | 'medium' | 'large';
-  data?: Record<string, any>; 
+  data?: Record<string, unknown>; 
 };
 
 const CompanySchema = new Schema(
@@ -44,4 +44,5 @@ export type ICompany = {
   createdBy: string;
 };
 
-export const Company = (models as any).Company || model("Company", CompanySchema);
+export const Company: Model<ICompany> =
+  models.Company || model<ICompany>("Company", CompanySchema);
