@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -7,12 +6,12 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuthStore, type AuthState } from "@/store/auth";
+import { axiosInstance } from "@/lib/axios";
 
 const LoginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -34,22 +33,14 @@ export default function LoginPage() {
 
   const onSubmit = async (values: LoginValues) => {
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Login failed");
-      }
-      login({ email: data.user.email, token: data.token, id: data.user.id });
+      const { data } = await axiosInstance.post("/api/auth/login", values);
+      login({ user: data.user });
       toast.success("Logged in successfully");
       const nextParam = searchParams.get("next");
-      const nextPath = nextParam ? decodeURIComponent(nextParam) : "/";
+      const nextPath = nextParam ? decodeURIComponent(nextParam) : "/dashboard";
       router.push(nextPath);
     } catch (err: any) {
-      const message = err?.message || "Login failed";
+      const message = err?.response?.data?.error || err?.message || "Login failed";
       form.setError("password", { type: "server", message });
       toast.error(message);
     }
@@ -77,7 +68,6 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="password"
@@ -91,7 +81,6 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-
             <Button type="submit" className="w-full">Login</Button>
           </form>
         </Form>
