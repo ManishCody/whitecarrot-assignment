@@ -1,13 +1,11 @@
 "use client";
-
 import React from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -24,6 +22,7 @@ type LoginValues = z.infer<typeof LoginSchema>;
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const login = useAuthStore((s: AuthState) => s.login);
 
   const form = useForm<LoginValues>({
@@ -37,7 +36,9 @@ export default function LoginPage() {
       const { data } = await axiosInstance.post("/api/auth/login", values);
       login({ user: data.user });
       toast.success("Logged in successfully");
-      router.push("/dashboard");
+      const nextParam = searchParams.get("next");
+      const nextPath = nextParam ? decodeURIComponent(nextParam) : "/dashboard";
+      router.push(nextPath);
     } catch (err: any) {
       const message = err?.response?.data?.error || err?.message || "Login failed";
       form.setError("password", { type: "server", message });
@@ -67,7 +68,6 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-
             <FormField
               control={form.control}
               name="password"
@@ -81,7 +81,6 @@ export default function LoginPage() {
                 </FormItem>
               )}
             />
-
             <Button type="submit" className="w-full">Login</Button>
           </form>
         </Form>
