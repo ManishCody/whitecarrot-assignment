@@ -29,6 +29,7 @@ export async function listJobs(filters: {
 export async function createJob(input: {
   companySlug: string;
   title: string;
+  workPolicy: string;
   location: string;
   department: string;
   employmentType: string;
@@ -47,6 +48,7 @@ export async function createJob(input: {
 
   const job = await Job.create({
     title: input.title,
+    workPolicy: input.workPolicy,
     location: input.location,
     department: input.department,
     employmentType: input.employmentType,

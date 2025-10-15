@@ -11,7 +11,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email and password required" }, { status: 400 });
     }
     const data = await loginUser({ email, password });
-    return NextResponse.json(data, { status: 200 });
+    const response = NextResponse.json({ user: data.user }, { status: 200 });
+    response.cookies.set('token', data.token, { 
+      httpOnly: true, 
+      secure: false, // Disable secure for development
+      sameSite: 'lax',
+      path: '/', 
+      maxAge: 60 * 60 * 24 * 7 
+    });
+    return response;
   } catch (err: any) {
     const status = err?.status || 500;
     return NextResponse.json({ error: err?.message || "Server error" }, { status });

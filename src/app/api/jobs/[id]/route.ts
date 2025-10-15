@@ -1,21 +1,29 @@
 import { NextResponse } from "next/server";
-import { requireAuth } from "@/lib/middleware/auth-middleware";
 import { updateJob, deleteJob } from "@/lib/controllers/job-controller";
+import { requireAuthWithRole } from "@/lib/auth-helper";
 
 export const runtime = "nodejs";
 
-type Params = { params: { id: string } };
+type Params = { params: Promise<{ id: string }> };
 
 export async function PUT(req: Request, { params }: Params) {
   try {
-    requireAuth(req);
+    // Require authentication
+    let auth;
+    try {
+      auth = await requireAuthWithRole();
+    } catch (error) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { userId } = auth;
 
     const body = await req.json();
     if (!body || Object.keys(body).length === 0) {
       return NextResponse.json({ error: "No fields to update" }, { status: 400 });
     }
 
-    const job = await updateJob(params.id, body ?? {});
+    const { id } = await params;
+    const job = await updateJob(id, body ?? {});
     return NextResponse.json({ job }, { status: 200 });
   } catch (err: any) {
     const status = err?.status || 500;
@@ -25,9 +33,17 @@ export async function PUT(req: Request, { params }: Params) {
 
 export async function DELETE(_req: Request, { params }: Params) {
   try {
-    requireAuth(_req);
+    // Require authentication
+    let auth;
+    try {
+      auth = await requireAuthWithRole();
+    } catch (error) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    const { userId } = auth;
 
-    const result = await deleteJob(params.id);
+    const { id } = await params;
+    const result = await deleteJob(id);
     return NextResponse.json(result, { status: 200 });
   } catch (err: any) {
     const status = err?.status || 500;

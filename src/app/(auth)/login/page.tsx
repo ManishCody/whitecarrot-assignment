@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuthStore, type AuthState } from "@/store/auth";
+import { axiosInstance } from "@/lib/axios";
 
 const LoginSchema = z.object({
   email: z.string().email("Enter a valid email"),
@@ -33,20 +34,12 @@ export default function LoginPage() {
 
   const onSubmit = async (values: LoginValues) => {
     try {
-      const res = await fetch("/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
-      });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Login failed");
-      }
-      login({ email: data.user.email, token: data.token, id: data.user.id });
+      const { data } = await axiosInstance.post("/api/auth/login", values);
+      login({ user: data.user });
       toast.success("Logged in successfully");
-      router.push("/");
+      router.push("/dashboard");
     } catch (err: any) {
-      const message = err?.message || "Login failed";
+      const message = err?.response?.data?.error || err?.message || "Login failed";
       form.setError("password", { type: "server", message });
       toast.error(message);
     }
