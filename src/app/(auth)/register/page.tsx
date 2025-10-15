@@ -34,14 +34,21 @@ interface RegisterValues extends FieldValues, z.infer<typeof RegisterSchema> {}
 export default function RegisterPage() {
   const router = useRouter();
   const login = useAuthStore((s: AuthState) => s.login);
-  const user = useAuthStore((s: AuthState) => s.user);
+  const { isAuthenticated, loading } = useAuthStore((s: AuthState) => ({
+    isAuthenticated: s.isAuthenticated,
+    loading: s.loading,
+  }));
+  const [hasCheckedAuth, setHasCheckedAuth] = React.useState(false);
 
   useEffect(() => {
-    if (user) {
-      toast.info("You are already logged in");
-      router.push("/dashboard");
+    if (!loading && !hasCheckedAuth) {
+      setHasCheckedAuth(true);
+      if (isAuthenticated) {
+        toast.info("You are already logged in");
+        router.push("/dashboard");
+      }
     }
-  }, [user, router]);
+  }, [isAuthenticated, loading, hasCheckedAuth, router]);
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(RegisterSchema),

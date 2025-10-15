@@ -21,7 +21,17 @@ export function Header() {
   return (
     <header className="w-full border-b bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto max-w-6xl px-4 py-3 flex items-center justify-between">
-        <Link href="/" className="font-semibold tracking-tight">Whitecarrot</Link>
+        <div className="flex items-center gap-6">
+          <Link href="/" className="font-semibold tracking-tight">Whitecarrot</Link>
+          {isAuthenticated && (
+            <Link 
+              href="/dashboard" 
+              className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Dashboard
+            </Link>
+          )}
+        </div>
         {!isAuthenticated ? (
           <div className="flex items-center gap-2">
             <Button asChild variant="ghost">
