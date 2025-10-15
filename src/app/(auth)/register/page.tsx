@@ -13,6 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { useAuthStore, type AuthState } from "@/store/auth";
+import { axiosInstance } from "@/lib/axios";
 
 const RegisterSchema = z
   .object({
@@ -20,6 +21,7 @@ const RegisterSchema = z
     email: z.string().email("Enter a valid email"),
     password: z.string().min(6, "Minimum 6 characters"),
     confirmPassword: z.string().min(6, "Minimum 6 characters"),
+    recruiterCode: z.string().optional(),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords do not match",
@@ -34,26 +36,23 @@ export default function RegisterPage() {
 
   const form = useForm<RegisterValues>({
     resolver: zodResolver(RegisterSchema),
-    defaultValues: { name: "", email: "", password: "", confirmPassword: "" },
+    defaultValues: { name: "", email: "", password: "", confirmPassword: "", recruiterCode: "" },
     mode: "onChange",
   });
 
   const onSubmit = async (values: RegisterValues) => {
     try {
-      const res = await fetch("/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: values.email, password: values.password }),
+      const { data } = await axiosInstance.post("/api/auth/register", {
+        name: values.name,
+        email: values.email,
+        password: values.password,
+        recruiterCode: values.recruiterCode,
       });
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data?.error || "Registration failed");
-      }
       login({ email: data.user.email, name: values.name, token: data.token, id: data.user.id });
       toast.success("Account created successfully");
       router.push("/");
     } catch (err: any) {
-      const message = err?.message || "Registration failed";
+      const message = err?.response?.data?.error || err?.message || "Registration failed";
       form.setError("confirmPassword", { type: "server", message });
       toast.error(message);
     }
@@ -118,6 +117,20 @@ export default function RegisterPage() {
                   <FormLabel>Confirm Password</FormLabel>
                   <FormControl>
                     <Input type="password" placeholder="••••••••" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="recruiterCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Recruiter Code (Optional)</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Enter code if you are a recruiter" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

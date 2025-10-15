@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { listJobs, createJob } from "@/lib/controllers/job-controller";
-import { requireAuth } from "@/lib/middleware/auth-middleware";
+import { requireAuthWithRole } from "@/lib/auth-helper";
 
 export const runtime = "nodejs";
 
@@ -26,13 +26,19 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   try {
-    // auth for writes
-    requireAuth();
-
+    // Require authentication for job creation
+    let auth;
+    try {
+      auth = await requireAuthWithRole();
+    } catch (error) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+    
     const body = await req.json();
     const required = [
       "companySlug",
       "title",
+      "workPolicy",
       "location",
       "department",
       "employmentType",
@@ -49,6 +55,7 @@ export async function POST(req: Request) {
     const job = await createJob({
       companySlug: body.companySlug,
       title: body.title,
+      workPolicy: body.workPolicy,
       location: body.location,
       department: body.department,
       employmentType: body.employmentType,

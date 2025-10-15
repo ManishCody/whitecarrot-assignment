@@ -6,7 +6,7 @@ if (!JWT_SECRET) {
   throw new Error("Missing JWT_SECRET environment variable");
 }
 
-export type JwtPayload = { sub: string; email: string };
+export type JwtPayload = { sub: string; email: string; role: string };
 
 export function signJwt(payload: JwtPayload, expiresIn: string | number = "7d") {
   return jwt.sign(payload, JWT_SECRET as jwt.Secret, { expiresIn } as jwt.SignOptions);
